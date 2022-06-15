@@ -7,10 +7,9 @@
 export const throttle = (fn, time) => {
     let count = null;
     return (...args) => {
-        const _self = this;
         if (count) return;
         count = setTimeout(() => {
-            fn.call(_self, ...args);
+            fn.call(this, ...args);
             count = null;
         }, time);
     };
