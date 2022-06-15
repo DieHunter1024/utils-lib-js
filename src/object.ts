@@ -1,4 +1,4 @@
-import { IGetValue, ISetValue } from "./types"
+import { IGetValue, ISetValue, IMixIn } from "./types"
 //lodash中的 _.get()，获取对象多级属性
 export const getValue: IGetValue = (object, key, defaultValue = '') => {
     const paths = key.split('.')
@@ -27,4 +27,15 @@ export const setValue: ISetValue = (object, key, value = {}) => {
 
     }
     return object
+}
+export const MixIn: IMixIn = (target, source = {}, overwrite = false) => {
+    for (const k in source) {
+        for (const key in source[k]) {
+            const proto = target.prototype ?? target
+            if (target[key] === undefined || overwrite) {
+                proto[key] = source[k][key]
+            }
+        }
+    }
+    return target
 }
