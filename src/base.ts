@@ -35,23 +35,23 @@ export const urlJoin = (url: string, query: object) => {
     return `${url}${url.includes("?") ? "&" : '?'}${params.join("&")}`;
 }
 
+export enum types {
+    "[object Array]" = "array",
+    "[object Object]" = "object",
+    "[object Set]" = 'set',
+    "[object Map]" = "map",
+    "[object WeakMap]" = "weakMap",
+    "[object WeakSet]" = "weakSet",
+    "[object Date]" = "date",
+    "[object RegExp]" = "regExp",
+    "[object Math]" = "math",
+};
 /**获取数据类型
 * @param {any} data  待检测数据
 * @return {string} 数据类型
 **/
 export const getType = (data: any) => {
     const type = typeof data;
-    const types = {
-        "[object Array]": "array",
-        "[object Object]": "object",
-        "[object Set]": 'set',
-        "[object Map]": "map",
-        "[object WeakMap]": "weakMap",
-        "[object WeakSet]": "weakSet",
-        "[object Date]": "date",
-        "[object RegExp]": "regExp",
-        "[object Math]": "math",
-    };
     if (data === null) {
         return "null";
     } else if (type === "object") {

@@ -4,7 +4,7 @@
 * @param {number} time  执行间隔/毫秒
 * @return {Function} 处理后的函数
 **/
-export const throttle = (fn, time) => {
+export const throttle = (fn: Function, time: number) => {
     let count = null;
     return (...args) => {
         if (count) return;
@@ -19,7 +19,7 @@ export const throttle = (fn, time) => {
 * @param {number} time  允许运行函数间隔/毫秒
 * @return {Function} 处理后的函数
 **/
-export const debounce = (fn, time) => {
+export const debounce = (fn: Function, time: number) => {
     let _timer = null;
     return () => {
         if (_timer) {
