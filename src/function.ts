@@ -1,7 +1,7 @@
 
 import { ICatchAwait, IThrottle, IDebounce, IDefer } from "./types"
 
-export const throttle: IThrottle = (fn: Function, time: number) => {
+export const throttle: IThrottle = (fn, time) => {
     let _timer = null;
     return (...args) => {
         if (_timer) return;
@@ -12,7 +12,7 @@ export const throttle: IThrottle = (fn: Function, time: number) => {
     };
 };
 
-export const debounce: IDebounce = (fn: Function, time: number) => {
+export const debounce: IDebounce = (fn, time) => {
     let _timer = null;
     return (...args) => {
         if (_timer) {
@@ -28,7 +28,7 @@ export const debounce: IDebounce = (fn: Function, time: number) => {
 export const defer: IDefer = () => {
     let resolve, reject
     return {
-        promise: new Promise<void>((_resolve: Function, _reject: Function) => {
+        promise: new Promise<void>((_resolve, _reject) => {
             resolve = _resolve
             reject = _reject
         }),

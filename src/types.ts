@@ -5,10 +5,13 @@ export interface IObject<T> {
     [key: IKey]: T | IObject<any>
 }
 export interface IPromise extends IObject<any> {
-    promise: Promise<any>
+    promise: Promise<void>
     resolve: () => unknown
     reject: () => unknown
 }
+
+export type IDemoteArray<T> = Array<IDemoteArray<T> | T>
+
 // base
 /**产生区间随机数
 * @param {number} min  最小区间
@@ -93,3 +96,23 @@ export type IDefer = () => IPromise
  * @returns {Promise<any>} [error, result]
  */
 export type ICatchAwait<T extends Promise<any>> = (defer: T) => T
+
+// array
+/**数组乱序
+ * @param {Array<any>} arr  目标数组
+ * @returns {Array<any>} 乱序后的数组
+ */
+export type IArrayRandom<T extends any[]> = (arr: T) => T
+
+/**数组数组去重
+ * @param {Array<any>} arr  目标数组
+ * @returns {Array<any>} 去重后的数组
+ */
+export type IArrayUniq<T extends any[]> = (arr: T) => T
+
+/**数组扁平化
+ * @param {Array<any>} arr  目标数组
+ * @returns {Array<any>} 扁平化的数组
+ */
+
+export type IArrayDemote<T extends IDemoteArray<any>> = (arr: T, result?: T) => T
