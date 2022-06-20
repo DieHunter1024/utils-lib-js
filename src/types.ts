@@ -24,3 +24,8 @@ export type ISetValue = <T>(object: IObject<T>, key: string, value?: any) => IOb
 * @return {IObject} 目标对象
 **/
 export type IMixIn = <U extends IObject<any>>(target?: U, source?: IObject<any>, overwrite?: boolean) => U
+/**await与try catch 捕获异常处理方法
+ * @param {Promise<any>} defer  延迟函数
+ * @returns {Promise<any>} Promise { <pending> }  返回异步结果数组，第一个参数是是否抛错
+ */
+export type ICatchAwait<T extends Promise<any>> = (defer: T) => T

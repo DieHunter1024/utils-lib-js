@@ -1,4 +1,5 @@
 
+import { ICatchAwait } from "./types"
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
 * @param {Function} fn  节流处理的函数
 * @param {number} time  执行间隔/毫秒
@@ -29,3 +30,20 @@ export const debounce = (fn: Function, time: number) => {
         _timer = setTimeout(fn, time);
     };
 }
+
+/**
+ * Promise扁平化，避免Promise嵌套
+ * @returns {Promise,resolve,reject} 
+ */
+export const defer = () => {
+    let resolve, reject
+    return {
+        promise: new Promise<void>((_resolve: Function, _reject: Function) => {
+            resolve = _resolve
+            reject = _reject
+        }),
+        resolve, reject
+    }
+}
+// await与try catch 捕获异常处理方法
+export const catchAwait: ICatchAwait<Promise<any>> = (defer) => defer.then(res => [null, res]).catch(err => [err])
