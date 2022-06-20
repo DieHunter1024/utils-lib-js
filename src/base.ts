@@ -1,18 +1,11 @@
 
-/**产生区间随机数
-* @param {number} min  最小区间
-* @param {number} max  最大区间
-* @param {boolean} bool  包含最大值
-* @return {IObject[IKey]} 对象某个属性
-**/
-export const randomNum = (min: number, max: number, bool?: boolean) => {
+import { IRandomNum, IUrlSplit, IUrlJoin, IGetType } from "./types"
+import { types } from "./static"
+
+export const randomNum: IRandomNum = (min, max, bool = false) => {
     return Math.floor(Math.random() * (max - min + (bool ? 1 : 0)) + min);
 }
-/**获取url的参数
-* @param {string} url  待截取的地址
-* @return {object} 参数对象
-**/
-export const urlSplit = (url: string) => {
+export const urlSplit: IUrlSplit = (url) => {
     const result = {};
     if (!url.includes("?")) {
         return result;
@@ -25,32 +18,12 @@ export const urlSplit = (url: string) => {
     return result;
 }
 
-/**添加url的参数
-* @param {string} url  待添加参数的地址
-* @param {object} query  待添加的参数
-* @return {string} 添加参数后的url
-**/
-export const urlJoin = (url: string, query: object) => {
+export const urlJoin: IUrlJoin = (url, query) => {
     const params = Object.keys(query).map(i => `${i}=${query[i]}`)
     return `${url}${url.includes("?") ? "&" : '?'}${params.join("&")}`;
 }
 
-export enum types {
-    "[object Array]" = "array",
-    "[object Object]" = "object",
-    "[object Set]" = 'set',
-    "[object Map]" = "map",
-    "[object WeakMap]" = "weakMap",
-    "[object WeakSet]" = "weakSet",
-    "[object Date]" = "date",
-    "[object RegExp]" = "regExp",
-    "[object Math]" = "math",
-};
-/**获取数据类型
-* @param {any} data  待检测数据
-* @return {string} 数据类型
-**/
-export const getType = (data: any) => {
+export const getType: IGetType<types> = (data) => {
     const type = typeof data;
     if (data === null) {
         return "null";
