@@ -1,8 +1,13 @@
 
 export type IKey = string | symbol | number
 // 对象类型
-export type IObject<T> = {
+export interface IObject<T> {
     [key: IKey]: T | IObject<any>
+}
+export interface IPromise extends IObject<any> {
+    promise: Promise<any>
+    resolve: () => unknown
+    reject: () => unknown
 }
 // base
 /**产生区间随机数
@@ -12,23 +17,25 @@ export type IObject<T> = {
 * @return {number} 随机数
 **/
 export type IRandomNum = (min: number, max: number, bool?: boolean) => number
+
 /**获取url的参数
 * @param {string} url  待截取的地址
 * @return {object} 参数对象
 **/
 export type IUrlSplit = (url: string) => IObject<any>
+
 /**添加url的参数
 * @param {string} url  待添加参数的地址
 * @param {object} query  待添加的参数
 * @return {string} 添加参数后的url
 **/
 export type IUrlJoin = (url: string, query: object) => string
+
 /**获取数据类型
 * @param {any} data  待检测数据
 * @return {string} 数据类型
 **/
 export type IGetType<T> = (data: any) => typeof data | T[keyof T] | "null";
-
 
 // object
 /**lodash中的 _.get()，获取对象某级属性
@@ -38,6 +45,7 @@ export type IGetType<T> = (data: any) => typeof data | T[keyof T] | "null";
 * @return {IObject[IKey]} 对象某个属性
 **/
 export type IGetValue = <T>(object: IObject<T> | IObject<T>[IKey], key: string, defaultValue?: any) => IObject<T>[IKey]
+
 /**lodash中的 _.set()，赋值对象某级属性
 * @param {IObject} object  目标对象
 * @param {string} key  对象层级
@@ -45,6 +53,7 @@ export type IGetValue = <T>(object: IObject<T> | IObject<T>[IKey], key: string, 
 * @return {IObject} 目标对象
 **/
 export type ISetValue = <T>(object: IObject<T>, key: string, value?: any) => IObject<T>
+
 /**对象混入
 * @param {IObject} target  目标对象
 * @param {string} source  需要混入的对象集合
@@ -52,10 +61,35 @@ export type ISetValue = <T>(object: IObject<T>, key: string, value?: any) => IOb
 * @return {IObject} 目标对象
 **/
 export type IMixIn = <U extends IObject<any>>(target?: U, source?: IObject<any>, overwrite?: boolean) => U
+
 /**await与try catch 捕获异常处理方法
  * @param {Promise<any>} defer  延迟函数
  * @returns {Promise<any>} Promise { <pending> }  返回异步结果数组，第一个参数是是否抛错
  */
 
 // function
+/**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
+* @param {Function} fn  节流处理的函数
+* @param {number} time  执行间隔/毫秒
+* @return {Function} 处理后的函数
+**/
+export type IThrottle = (fn: Function, time: number) => (...args: any[]) => void
+
+/**防抖(debounce):触发高频事件后 n 秒内函数只会执行一次
+* @param {Function} fn  防抖处理的函数
+* @param {number} time  允许运行函数间隔/毫秒
+* @return {Function} 处理后的函数
+**/
+export type IDebounce = (fn: Function, time: number) => (...args: any[]) => void
+
+/**
+ * Promise扁平化，避免Promise嵌套
+ * @returns {Promise,resolve,reject} 
+ */
+export type IDefer = () => IPromise
+
+/**await与try catch 捕获异常处理方法
+ * @param {Promise<any>} defer  延迟函数
+ * @returns {Promise<any>} [error, result]
+ */
 export type ICatchAwait<T extends Promise<any>> = (defer: T) => T

@@ -1,41 +1,31 @@
 
-import { ICatchAwait } from "./types"
-/**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
-* @param {Function} fn  节流处理的函数
-* @param {number} time  执行间隔/毫秒
-* @return {Function} 处理后的函数
-**/
-export const throttle = (fn: Function, time: number) => {
-    let count = null;
+import { ICatchAwait, IThrottle, IDebounce, IDefer } from "./types"
+
+export const throttle: IThrottle = (fn: Function, time: number) => {
+    let _timer = null;
     return (...args) => {
-        if (count) return;
-        count = setTimeout(() => {
+        if (_timer) return;
+        _timer = setTimeout(() => {
             fn.call(this, ...args);
-            count = null;
+            _timer = null;
         }, time);
     };
 };
-/**防抖(debounce):触发高频事件后 n 秒内函数只会执行一次
-* @param {Function} fn  防抖处理的函数
-* @param {number} time  允许运行函数间隔/毫秒
-* @return {Function} 处理后的函数
-**/
-export const debounce = (fn: Function, time: number) => {
+
+export const debounce: IDebounce = (fn: Function, time: number) => {
     let _timer = null;
-    return () => {
+    return (...args) => {
         if (_timer) {
             clearTimeout(_timer);
             _timer = null;
         }
-        _timer = setTimeout(fn, time);
+        _timer = setTimeout(() => {
+            fn.call(this, ...args);
+        }, time);
     };
 }
 
-/**
- * Promise扁平化，避免Promise嵌套
- * @returns {Promise,resolve,reject} 
- */
-export const defer = () => {
+export const defer: IDefer = () => {
     let resolve, reject
     return {
         promise: new Promise<void>((_resolve: Function, _reject: Function) => {
@@ -45,5 +35,5 @@ export const defer = () => {
         resolve, reject
     }
 }
-// await与try catch 捕获异常处理方法
+
 export const catchAwait: ICatchAwait<Promise<any>> = (defer) => defer.then(res => [null, res]).catch(err => [err])
