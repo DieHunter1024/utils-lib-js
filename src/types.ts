@@ -65,11 +65,6 @@ export type ISetValue = <T>(object: IObject<T>, key: string, value?: any) => IOb
 **/
 export type IMixIn = <U extends IObject<any>>(target?: U, source?: IObject<any>, overwrite?: boolean) => U
 
-/**await与try catch 捕获异常处理方法
- * @param {Promise<any>} defer  延迟函数
- * @returns {Promise<any>} Promise { <pending> }  返回异步结果数组，第一个参数是是否抛错
- */
-
 // function
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
 * @param {Function} fn  节流处理的函数
@@ -116,3 +111,22 @@ export type IArrayUniq<T extends any[]> = (arr: T) => T
  */
 
 export type IArrayDemote<T extends IDemoteArray<any>> = (arr: T, result?: T) => T
+
+// element
+/**IElementParams
+ * @param {string} ele 标签类型
+ * @param {CSSStyleDeclaration} style 样式
+ * @param {Attr} attr 属性
+ * @param {object} parent 父元素
+ */
+interface IElementParams<T> {
+    ele: T | string
+    style: CSSStyleDeclaration
+    attr: Attr
+    parent: T
+}
+/**新增标签，设置属性及样式
+ * @param {IElementParams} params 配置
+ * @return {ElementObject} 生成的标签
+ */
+export type ICreateElement<T = HTMLElement> = (params: IElementParams<T>) => T
