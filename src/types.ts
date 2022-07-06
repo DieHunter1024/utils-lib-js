@@ -1,3 +1,4 @@
+import { types } from "./static"
 
 export type IKey = string | symbol | number
 // 对象类型
@@ -64,6 +65,25 @@ export type ISetValue = <T>(object: IObject<T>, key: string, value?: any) => IOb
 * @return {IObject} 目标对象
 **/
 export type IMixIn = <U extends IObject<any>>(target?: U, source?: IObject<any>, overwrite?: boolean) => U
+
+/**枚举值反向映射
+* @param {IObject<string>} target  目标对象
+* @return {IObject<string>} 目标对象
+**/
+export type IEnumInversion = (target: IObject<string>) => IObject<string>
+
+/**对象复制
+* @param {IObject<any>} target  目标对象
+* @return {IObject} 目标对象
+**/
+export type ICloneDeep = (target?: any) => any
+
+/**生成 对象 类型的初始值
+* @param {string} type  数据类型
+* @param {any} __init  初始值
+* @return {any} 目标对象
+**/
+export type ICreateObjectVariable = (type: string, source?: any) => any
 
 // function
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
