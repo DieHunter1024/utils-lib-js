@@ -1,36 +1,29 @@
 # utils-lib-js
 
-#### Description
+#### 介绍
 JavaScript工具函数，封装的一些常用的js函数
 
-#### Software Architecture
-Software architecture description
-
-#### Installation
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Instructions
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### Contribution
-
-1.  Fork the repository
-2.  Create Feat_xxx branch
-3.  Commit your code
-4.  Create Pull Request
+#### 软件架构
+软件架构说明
 
 
-#### Gitee Feature
+#### 安装教程
 
-1.  You can use Readme\_XXX.md to support different languages, such as Readme\_en.md, Readme\_zh.md
-2.  Gitee blog [blog.gitee.com](https://blog.gitee.com)
-3.  Explore open source project [https://gitee.com/explore](https://gitee.com/explore)
-4.  The most valuable open source project [GVP](https://gitee.com/gvp)
-5.  The manual of Gitee [https://gitee.com/help](https://gitee.com/help)
-6.  The most popular members  [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1.  pnpm i
+2.  pnpm build
+
+#### 使用说明
+
+1.  pnpm build（构建）
+2.  pnpm debug（调试源码）
+
+#### 参与贡献
+
+1.  Fork 本仓库
+2.  新建 Feat_xxx 分支
+3.  提交代码
+4.  新建 Pull Request
+
+#### 功能
+接口：
+src\types.ts
