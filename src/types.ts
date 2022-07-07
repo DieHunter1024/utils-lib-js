@@ -162,3 +162,38 @@ interface IElementParams<T> {
  * @return {ElementObject} 生成的标签
  */
 export type ICreateElement<T = HTMLElement> = (params: IElementParams<T>) => T
+
+// event
+/**浏览器事件
+ * @param {Document} ele 标签
+ * @param {string} type 事件类型
+ * @param {(e: Event) => void} handler 事件回调
+ * @return {void}
+ */
+export type IAddHandler = <T extends Document>(ele: T, type: string, handler: (e: Event) => void) => void
+
+/**取消事件冒泡
+ * @param {Event} e 浏览器事件对象
+ * @return {void}
+ */
+export type IStopBubble = (e: Event) => void
+
+/**取消默认事件
+ * @param {Event} e 浏览器事件对象
+ * @return {void}
+ */
+export type IStopDefault = (e: Event) => void
+
+/**取消浏览器事件
+ * @param {Document} ele 标签
+ * @param {string} type 事件类型
+ * @param {(e: Event) => void} handler 事件回调
+ * @return {void}
+ */
+export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler: (e: Event) => void) => void
+
+/**取消默认事件
+ * @param {Event} e 浏览器事件对象
+ * @return {void}
+ */
+export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
