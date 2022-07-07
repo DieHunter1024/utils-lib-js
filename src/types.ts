@@ -85,6 +85,18 @@ export type ICloneDeep = (target?: any) => any
 **/
 export type ICreateObjectVariable = (type: string, source?: any) => any
 
+/**Object.create 根据源对象产出新对象
+* @param {Function|Object} source  源对象
+* @return {Function|Object} 对象产物
+**/
+export type ICreateObject = <T, U extends T>(source: T) => U
+
+/**类的继承
+* @param {Function} source  源对象
+* @return {Function} 继承产物
+**/
+export type IInherit = <T extends Function>(source: T, target?: Function) => Function
+
 // function
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
 * @param {Function} fn  节流处理的函数

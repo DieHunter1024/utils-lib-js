@@ -1,4 +1,4 @@
-import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion } from "./types"
+import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject } from "./types"
 import { getType } from "./base"
 export const getValue: IGetValue = (object, key, defaultValue = '') => {
     const paths = key.split('.')
@@ -92,3 +92,17 @@ export const createObjectVariable: ICreateObjectVariable = (type, source = {}) =
             return {}
     }
 }
+
+export const createObject: ICreateObject = (source) => {
+    function F() { }
+    F.prototype = source
+    return new F()
+}
+
+export const inherit: IInherit = (source, target = function () { }) => {
+    target.prototype = createObject(source.prototype)
+    target.prototype.super = source;
+    target.prototype.constructor = target;
+    return target
+}
+
