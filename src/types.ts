@@ -213,3 +213,15 @@ export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler:
  * @return {void}
  */
 export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
+
+// request
+export type IRequest = {
+    origin: string
+    fixOrigin: <T = string>(origin: T) => T
+    envDesc: () => "Window" | "Node"
+}
+
+export type IGet = (url: string, params: IObject<any>) => Promise<void>
+// export type IGet = (url: string, params: IObject<any>) => Promise<void>
+// export type IGet = (url: string, params: IObject<any>) => Promise<void>
+// export type IGet = (url: string, params: IObject<any>) => Promise<void>
