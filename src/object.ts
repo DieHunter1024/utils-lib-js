@@ -1,5 +1,6 @@
-import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject } from "./types"
+import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject, IGetInstance, IClassDecorator } from "./types"
 import { getType } from "./base"
+import { IObject } from "../dist/esm"
 export const getValue: IGetValue = (object, key, defaultValue = '') => {
     const paths = key.split('.')
     for (const i of paths) { //逐层遍历path
@@ -106,3 +107,19 @@ export const inherit: IInherit = (source, target = function () { }) => {
     return target
 }
 
+export const getInstance: IGetInstance = (classProto, overwrite = false, ...params) => {
+    if (!classProto._instance || overwrite) {
+        classProto._instance = new classProto(...params)
+    }
+    return classProto._instance;
+}
+
+export const classDecorator: IClassDecorator = (params): ClassDecorator => {
+    return (target) => {
+        for (const key in params) {
+            if (!!!Reflect.has(target.prototype, key)) {
+                target.prototype[key] = params[key]
+            }
+        }
+    }
+}

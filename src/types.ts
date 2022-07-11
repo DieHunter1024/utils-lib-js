@@ -10,7 +10,9 @@ export interface IPromise extends IObject<any> {
     resolve: () => unknown
     reject: () => unknown
 }
-
+export type IInstance<T> = {
+    _instance: Function
+} & T
 export type IDemoteArray<T> = Array<IDemoteArray<T> | T>
 
 // base
@@ -96,6 +98,20 @@ export type ICreateObject = <T, U extends T>(source: T) => U
 * @return {Function} 继承产物
 **/
 export type IInherit = <T extends Function>(source: T, target?: Function) => Function
+
+/**生成类的实例单例
+* @param {Function} classProto  类
+* @param {Boolean} overwrite  是否覆盖已有单例
+* @param {any[]} params  构造函数的参数
+* @return {IObject} 实例化的单例
+**/
+export type IGetInstance = (classProto: IInstance<FunctionConstructor>, overwrite?: boolean, ...params: any[]) => Function
+
+/**通过装饰器将属性混入类中
+* @param {IObject<any>} params  混入的属性
+* @return {ClassDecorator} 装饰器钩子函数
+**/
+export type IClassDecorator = (params: IObject<any>) => <TFunction extends Function>(target: TFunction) => void
 
 // function
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
