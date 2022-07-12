@@ -1,4 +1,4 @@
-import { getType } from "./base"
+import { getType } from "./index"
 import { IArrayRandom, IArrayUniq, IArrayDemote, IDemoteArray } from "./types"
 
 export const arrayRandom: IArrayRandom<any[]> = arr => arr.sort(() => Math.random() - 0.5);

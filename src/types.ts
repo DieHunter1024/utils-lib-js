@@ -1,4 +1,3 @@
-import { types } from "./static"
 
 export type IKey = string | symbol | number
 // 对象类型
@@ -7,8 +6,8 @@ export interface IObject<T> {
 }
 export interface IPromise extends IObject<any> {
     promise: Promise<void>
-    resolve: () => unknown
-    reject: () => unknown
+    resolve: (res: any) => unknown
+    reject: (err: any) => unknown
 }
 export type IInstance<T> = {
     _instance: Function
@@ -217,8 +216,11 @@ export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 // request
 export type IRequest = {
     origin: string
-    fixOrigin: <T = string>(origin: T) => T
+    fixOrigin: <T = string>(origin: T) => IRequest
     envDesc: () => "Window" | "Node"
+    fetch: () => Promise<Response>
+    // ajax: () => Promise<Response>
+    // http: () => Promise<Response>
 }
 
 export type IGet = (url: string, params: IObject<any>) => Promise<void>

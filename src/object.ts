@@ -1,5 +1,5 @@
 import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject, IGetInstance, IClassDecorator } from "./types"
-import { getType } from "./base"
+import { getType } from "./index"
 export const getValue: IGetValue = (object, key, defaultValue = '') => {
     const paths = key.split('.')
     for (const i of paths) { //逐层遍历path
