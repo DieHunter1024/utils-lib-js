@@ -1,5 +1,5 @@
 
-import { ICatchAwait, IThrottle, IDebounce, IDefer } from "./types"
+import { ICatchAwait, IThrottle, IDebounce, IDefer } from "./index.js"
 
 export const throttle: IThrottle = (fn, time) => {
     let _timer = null;

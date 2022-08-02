@@ -1,5 +1,4 @@
-import { IRequest, IGet } from "./types"
-import { urlJoin, defer } from "./index"
+import { urlJoin, defer, IRequest, IGet } from "./index.js"
 export class Request implements IRequest {
     origin: string
     constructor() {
@@ -21,28 +20,28 @@ export class Request implements IRequest {
         const xhr = new XMLHttpRequest()
         switch (method) {
             case 'GET':
-                url = urlJoin(url, params);
+                // url = urlJoin(url, params);
                 break;
 
             default:
                 break;
         }
-        xhr.addEventListener('timeout', reject)
+        // xhr.addEventListener('timeout', reject)
         xhr.addEventListener('load', () => {
             if (xhr.readyState === 4 && xhr.status === 200) {
                 try {
-                    resolve(JSON.parse(xhr.response))
+                    // resolve(JSON.parse(xhr.response))
                 } catch (error) {
-                    reject(error)
+                    // reject(error)
                 }
             } else {
-                reject(xhr)
+                // reject(xhr)
             }
         })
         xhr.open(method, url, async);
         xhr.send(body)
         xhr.timeout = async && timeout
-        return promise
+        // return promise
     }
     fetch() {
         return fetch("")
@@ -68,4 +67,4 @@ export const OPTION = () => {
 
 }
 
-new Request().ajax("/api", { timeout: 115 })
+// new Request().ajax("/api", { timeout: 115 })

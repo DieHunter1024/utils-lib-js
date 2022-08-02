@@ -1,6 +1,5 @@
 
-import { IRandomNum, IUrlSplit, IUrlJoin, IGetType } from "./types"
-import { types } from "./static"
+import { IRandomNum, IUrlSplit, IUrlJoin, IGetType, types } from "./index.js"
 
 export const randomNum: IRandomNum = (min, max, bool = false) => {
     return Math.floor(Math.random() * (max - min + (bool ? 1 : 0)) + min);

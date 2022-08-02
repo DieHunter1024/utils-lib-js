@@ -1,6 +1,6 @@
 import {
     IAddHandler, IStopBubble, IStopDefault, IRemoveHandler, IDispatchEvent
-} from "./types"
+} from "./index.js"
 export const addHandler: IAddHandler = (ele, type, handler) => {
     if (ele.addEventListener) {
         ele.addEventListener(type, handler, false);

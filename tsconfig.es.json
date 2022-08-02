@@ -1,12 +1,8 @@
 {
     "extends": "./tsconfig",
     "compilerOptions": {
-        "module": "es2015",
+        "module": "ES6",
         "outDir": "dist/esm",
-        "moduleResolution": "node"
-    },
-    "exclude": [
-        "**/__tests__/**",
-        "**/example/**"
-    ]
+        "rootDir": "src"
+    }
 }
