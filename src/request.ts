@@ -1,70 +1,79 @@
-import { urlJoin, defer, IRequest, IGet } from "./index.js"
-export class Request implements IRequest {
+import { urlJoin, defer, IRequest, IRequestBase } from "./index.js"
+
+
+export abstract class RequestBase implements IRequestBase {
     origin: string
-    constructor() {
-        // return this.envDesc()
+    constructor(origin) {
+        this.origin = origin ?? ''
     }
-    fixOrigin(origin) {
-        this.origin = origin
-        return this
+    abstract fetch(url, opts): Promise<void>
+    abstract http(url, opts): Promise<void>
+    chackUrl = (url) => {
+        return url.startsWith('/')
     }
-    envDesc() {
+    fixOrigin = (fixStr: string) => {
+        if (this.chackUrl(fixStr)) return this.origin + fixStr
+        return fixStr
+    }
+    envDesc = () => {
         if (Window) {
             return "Window"
         }
         return "Node"
     }
-    ajax(url, opts) {
-        const { promise, resolve, reject } = defer()
-        const { method = "GET", params = {}, body = {}, async = true, timeout = 30 * 1000 } = opts
-        const xhr = new XMLHttpRequest()
-        switch (method) {
-            case 'GET':
-                // url = urlJoin(url, params);
-                break;
-
-            default:
-                break;
+    requestType = () => {
+        switch (this.envDesc()) {
+            case "Window":
+                return this.fetch
+            case "Node":
+                return this.http
         }
-        // xhr.addEventListener('timeout', reject)
-        xhr.addEventListener('load', () => {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                try {
-                    // resolve(JSON.parse(xhr.response))
-                } catch (error) {
-                    // reject(error)
-                }
-            } else {
-                // reject(xhr)
-            }
+    }
+    initOptions = (opts) => {
+        const { method = "GET", params = {}, body = {}, async = true, timeout = 30 * 1000 } = opts
+        return { method, params, body, async, timeout }
+    }
+
+}
+export class Request extends RequestBase implements IRequest {
+    request: Function
+    constructor(origin) {
+        super(origin)
+        this.request = this.requestType()
+    }
+
+    fetch = (url, opts) => {
+        const { promise, resolve, reject } = defer()
+        url = this.fixOrigin(url)
+        const { method, params, body, async, timeout } = this.initOptions(opts)
+        fetch(url, this.initOptions(opts)).then((res) => {
+            console.log(res)
+            return res.json()
+        }).then((res) => {
+            console.log(res)
         })
-        xhr.open(method, url, async);
-        xhr.send(body)
-        xhr.timeout = async && timeout
-        // return promise
+        return promise
     }
-    fetch() {
-        return fetch("")
+    http = (url, opts) => {
+        const { promise, resolve, reject } = defer()
+        return promise
     }
-    http() {
 
+    GET = (url, params = {}) => {
+        return this.request(url, { params, method: "GET" })
+    }
+
+    POST = (url, params = {}, body = {}) => {
+        return this.request(url, { params, method: "POST", body })
+    }
+    PUT = (url, params = {}, body = {}) => {
+        return this.request(url, { params, method: "PUT", body })
+    }
+    DELETE = (url, params = {}) => {
+        return this.request(url, { params, method: "DELETE" })
+    }
+    OPTION = () => {
+        const { promise, resolve, reject } = defer()
+        return promise
     }
 }
-export const GET = () => {
-
-}
-
-export const POST = () => {
-
-}
-export const PUT = () => {
-
-}
-export const DELETE = () => {
-
-}
-export const OPTION = () => {
-
-}
-
-// new Request().ajax("/api", { timeout: 115 })

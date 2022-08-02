@@ -214,16 +214,33 @@ export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler:
 export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 
 // request
-export type IRequest = {
+export type IRequestBase = {
     origin: string
-    fixOrigin: <T = string>(origin: T) => IRequest
+    fixOrigin: (fixStr: string) => string
     envDesc: () => "Window" | "Node"
-    fetch: () => Promise<Response>
-    // ajax: () => Promise<Response>
-    // http: () => Promise<Response>
+    chackUrl: (url: string) => boolean
+    fetch: (url: string, opts: IRequestOptions) => Promise<any>
+    http: (url: string, opts: IRequestOptions) => Promise<any>
 }
 
-export type IGet = (url: string, params: IObject<any>) => Promise<void>
-// export type IGet = (url: string, params: IObject<any>) => Promise<void>
-// export type IGet = (url: string, params: IObject<any>) => Promise<void>
-// export type IGet = (url: string, params: IObject<any>) => Promise<void>
+export type IRequest = {
+    request: Function
+    GET: (url: string, params: IObject<any>) => Promise<any>
+    POST: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
+    DELETE: (url: string, params: IObject<any>) => Promise<any>
+    PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
+    OPTION: (url: string, opts: IRequestOptions) => Promise<any>
+} & IRequestBase
+export type IRequestParams<T> = T | IObject<any> | any
+export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
+export type IRequestBody = IRequestParams<RequestInit['body']>
+export type IRequestHeaders = IRequestParams<RequestInit['headers']>
+export type IRequestOptions = {
+    method?: IRequestMethods
+    params?: IRequestParams<IObject<any>>
+    body?: IRequestBody
+    headers?: IRequestHeaders
+    signal?: AbortSignal
+    async?: boolean
+    timeout?: number
+}

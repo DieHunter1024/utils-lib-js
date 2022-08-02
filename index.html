@@ -9,7 +9,9 @@
   <body>
     <script type="module">
       import { Request } from "./dist/esm/request.js";
-      console.log(Request);
+      new Request("https://www.fastmock.site").GET(
+        "/mock/b1778e8672225082c3155898799ed9d3/api/list"
+      );
     </script>
   </body>
 </html>
