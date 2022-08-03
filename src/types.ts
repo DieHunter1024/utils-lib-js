@@ -236,11 +236,17 @@ export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 // request
 
 export type IRequestParams<T> = T | IObject<any> | null
+// fetch返回取值方式
 export type IDataType = "text" | "json" | "blob" | "formData" | "arrayBuffer"
+// 请求方式
 export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
+// body结构
 export type IRequestBody = IRequestParams<BodyInit>
+// heads结构
 export type IRequestHeaders = IRequestParams<HeadersInit>
-export type IrequestFn = (url: string, params: IObject<any>, body: IRequestBody, opts: IRequestOptions) => Promise<any>
+// 请求函数体
+export type IRequestFn = (url: string, params: IObject<any>, body: IRequestBody, opts: IRequestOptions) => Promise<any>
+// 请求参数
 export type IRequestOptions = {
     method?: IRequestMethods
     query?: IRequestParams<IObject<any>>
@@ -250,14 +256,14 @@ export type IRequestOptions = {
     timeout?: number
     [key: string]: any
 }
-
+// 拦截器
 export type IInterceptors = {
     use(type: "request" | "response" | "error", fn: Function): void
     get reqFn(): Function
     get resFn(): Function
     get errFn(): Function
 }
-
+// 公共函数
 export type IRequestBase = {
     origin: string
     fixOrigin: (fixStr: string) => string
@@ -268,12 +274,12 @@ export type IRequestBase = {
     initFetchParams: (url: string, opts: IRequestOptions) => any
     getDataByType: (type: IDataType, response: Response) => Promise<any>
 }
-
+// 请求主体类
 export type IRequest = {
     request: Function
-    GET: IrequestFn
-    POST: IrequestFn
-    DELETE: IrequestFn
-    PUT: IrequestFn
-    OPTION: IrequestFn
+    GET: IRequestFn
+    POST: IRequestFn
+    DELETE: IRequestFn
+    PUT: IRequestFn
+    OPTION: IRequestFn
 } & IRequestBase

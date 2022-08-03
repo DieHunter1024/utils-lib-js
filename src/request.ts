@@ -60,8 +60,9 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
     }
     initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), type = "json", ...others }) => {
         url = urlJoin(this.fixOrigin(url), query)
+        const timer = setTimeout(() => abort.abort(), timeout)
         const params = {
-            url, method, headers, body: method === "GET" ? null : jsonToString(body), signal: abort.signal, type, ...others
+            url, method, headers, body: method === "GET" ? null : jsonToString(body), timeout, timer, signal: abort.signal, type, ...others
         }
         return this.reqFn?.(params) ?? params
     }
@@ -89,12 +90,15 @@ export class Request extends RequestBase implements IRequest {
     fetch = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
         const { url, ...opts } = this.initFetchParams(_url, _opts)
+        const { signal, timer } = opts
+        const errorFn = err => reject(this.errFn?.(err) ?? err)
+        signal.addEventListener('abort', errorFn);
         fetch(url, opts).then((response) => {
             if (response.status >= 200 && response.status < 300) {
                 return this.getDataByType(opts.type, response)
             }
-            return reject(response.statusText)
-        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(err => reject(this.errFn?.(err) ?? err))
+            return errorFn(response.statusText)
+        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(errorFn).finally(() => clearTimeout(timer))
         return promise
     }
     http = (url, opts) => {

@@ -9,28 +9,27 @@
   <body>
     <script type="module">
       import { Request } from "./dist/esm/request.js";
-      const resource = new Request("https://www.fastmock.site");
-      // resource
-      //   .use("request", (params) => {
-      //     return params;
-      //   })
-      //   .use("response", (params) => {
-      //     return params;
-      //   })
-      //   .use("error", (error) => {
-      //     return error;
-      //   });
+      const resource = new Request("http://127.0.0.1:1024");
       resource
-        .OPTION(
-          "/mock/b1778e8672225082c3155898799ed9d3/api/list",
+        .use("request", (params) => {
+          return params;
+        })
+        .use("response", (params) => {
+          return params;
+        })
+        .use("error", (error) => {
+          console.log(error)
+          return error;
+        });
+      resource
+        .GET(
+          "/getList",
           {
             name: "hello",
             age: 22,
           },
-          {
-            name: "world",
-            age: 23,
-          }
+          {},
+          {}
         )
         .then((res) => console.log(res));
     </script>
