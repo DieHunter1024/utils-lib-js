@@ -214,28 +214,9 @@ export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler:
 export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 
 // request
-export type IInterceptors = {
-    use(type: "request" | "response" | "error", fn: Function): void
-}
-export type IRequestBase = {
-    origin: string
-    fixOrigin: (fixStr: string) => string
-    envDesc: () => "Window" | "Node"
-    chackUrl: (url: string) => boolean
-    fetch: (url: string, opts: IRequestOptions) => Promise<any>
-    http: (url: string, opts: IRequestOptions) => Promise<any>
-    initFetchParams: (url: string, opts: IRequestOptions) => any
-}
 
-export type IRequest = {
-    request: Function
-    GET: (url: string, params: IObject<any>) => Promise<any>
-    POST: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    DELETE: (url: string, params: IObject<any>) => Promise<any>
-    PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    OPTION: (url: string, opts: IRequestOptions) => Promise<any>
-} & IRequestBase
 export type IRequestParams<T> = T | IObject<any> | null
+export type IDataType = "text" | "json" | "blob" | "formData" | "arrayBuffer"
 export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
 export type IRequestBody = IRequestParams<BodyInit>
 export type IRequestHeaders = IRequestParams<HeadersInit>
@@ -248,3 +229,30 @@ export type IRequestOptions = {
     timeout?: number
     [key: string]: any
 }
+
+export type IInterceptors = {
+    use(type: "request" | "response" | "error", fn: Function): void
+    get reqFn(): Function
+    get resFn(): Function
+    get errFn(): Function
+}
+
+export type IRequestBase = {
+    origin: string
+    fixOrigin: (fixStr: string) => string
+    envDesc: () => "Window" | "Node"
+    chackUrl: (url: string) => boolean
+    fetch: (url: string, opts: IRequestOptions) => Promise<any>
+    http: (url: string, opts: IRequestOptions) => Promise<any>
+    initFetchParams: (url: string, opts: IRequestOptions) => any
+    getDataByType: (type: IDataType, response: Response) => Promise<any>
+}
+
+export type IRequest = {
+    request: Function
+    GET: (url: string, params: IObject<any>) => Promise<any>
+    POST: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
+    DELETE: (url: string, params: IObject<any>) => Promise<any>
+    PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
+    OPTION: (url: string, opts: IRequestOptions) => Promise<any>
+} & IRequestBase

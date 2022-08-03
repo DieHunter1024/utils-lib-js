@@ -58,11 +58,24 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
                 return this.http
         }
     }
-    initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), ...others }) => {
-        const params: RequestInit = {
-            method, headers, body: method === "GET" ? null : body, signal: abort.signal, ...others
+    initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), type = "json", ...others }) => {
+        url = this.fixOrigin(url)
+        const params = {
+            url, method, headers, body: method === "GET" ? null : body, signal: abort.signal, type, ...others
         }
         return this.reqFn?.(params) ?? params
+    }
+    getDataByType = (type, response) => {
+        switch (type) {
+            case "text":
+            case "json":
+            case "blob":
+            case "formData":
+            case "arrayBuffer":
+                return response[type]()
+            default:
+                return response['json']()
+        }
     }
 
 }
@@ -73,12 +86,12 @@ export class Request extends RequestBase implements IRequest {
         this.request = this.requestType()
     }
 
-    fetch = (url, opts) => {
+    fetch = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
-        url = this.fixOrigin(url)
-        fetch(url, this.initFetchParams(url, opts)).then((response) => {
+        const { url, ...opts } = this.initFetchParams(_url, _opts)
+        fetch(url, opts).then((response) => {
             if (response.status >= 200 && response.status < 300) {
-                return response.json()
+                return this.getDataByType(opts.type, response)
             }
             return reject(response.statusText)
         }).then(res => resolve(this.resFn?.(res) ?? res)).catch(err => reject(this.errFn?.(err) ?? err))
@@ -89,18 +102,18 @@ export class Request extends RequestBase implements IRequest {
         return promise
     }
 
-    GET = (url, params = {}) => {
-        return this.request(url, { params, method: "GET" })
+    GET = (url, query = {}) => {
+        return this.request(url, { query, method: "GET" })
     }
 
-    POST = (url, params = {}, body = {}) => {
-        return this.request(url, { params, method: "POST", body })
+    POST = (url, query = {}, body = {}) => {
+        return this.request(url, { query, method: "POST", body })
     }
-    PUT = (url, params = {}, body = {}) => {
-        return this.request(url, { params, method: "PUT", body })
+    PUT = (url, query = {}, body = {}) => {
+        return this.request(url, { query, method: "PUT", body })
     }
-    DELETE = (url, params = {}) => {
-        return this.request(url, { params, method: "DELETE" })
+    DELETE = (url, query = {}) => {
+        return this.request(url, { query, method: "DELETE" })
     }
     OPTION = () => {
         const { promise, resolve, reject } = defer()
