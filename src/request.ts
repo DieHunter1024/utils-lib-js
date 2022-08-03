@@ -1,4 +1,4 @@
-import { urlJoin, defer, IRequest, IRequestBase, IInterceptors } from "./index.js"
+import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IInterceptors } from "./index.js"
 
 export class Interceptors implements IInterceptors {
     private requestSuccess: Function
@@ -59,9 +59,9 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
         }
     }
     initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), type = "json", ...others }) => {
-        url = this.fixOrigin(url)
+        url = urlJoin(this.fixOrigin(url), query)
         const params = {
-            url, method, headers, body: method === "GET" ? null : body, signal: abort.signal, type, ...others
+            url, method, headers, body: method === "GET" ? null : jsonToString(body), signal: abort.signal, type, ...others
         }
         return this.reqFn?.(params) ?? params
     }
@@ -106,14 +106,14 @@ export class Request extends RequestBase implements IRequest {
         return this.request(url, { query, method: "GET" })
     }
 
-    POST = (url, query = {}, body = {}) => {
+    POST = (url, query = {}, body) => {
         return this.request(url, { query, method: "POST", body })
     }
-    PUT = (url, query = {}, body = {}) => {
+    PUT = (url, query = {}, body) => {
         return this.request(url, { query, method: "PUT", body })
     }
-    DELETE = (url, query = {}) => {
-        return this.request(url, { query, method: "DELETE" })
+    DELETE = (url, query = {}, body) => {
+        return this.request(url, { query, method: "DELETE", body })
     }
     OPTION = () => {
         const { promise, resolve, reject } = defer()

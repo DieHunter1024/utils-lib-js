@@ -42,6 +42,14 @@ export type IUrlJoin = (url: string, query: object) => string
 **/
 export type IGetType<T> = (data: any) => typeof data | T[keyof T] | "null";
 
+/**批量判断数据类型
+* @param {any} data  待检测数据
+* @param {any} whiteList  数据类型名单
+* @return {boolean} 是否在白名单中
+**/
+export type IGetTypeByList = (data: any, whiteList: string[]) => boolean;
+
+
 // object
 /**lodash中的 _.get()，获取对象某级属性
 * @param {IObject} object  目标对象
@@ -111,6 +119,18 @@ export type IGetInstance = (classProto: IInstance<FunctionConstructor>, overwrit
 * @return {ClassDecorator} 装饰器钩子函数
 **/
 export type IClassDecorator = (params: IObject<any>) => <TFunction extends Function>(target: TFunction) => void
+
+/**JSON.parse封装
+* @param {string} target  字符串
+* @return {IObject<any>} 对象
+**/
+export type IStringToJson = (target: string) => IObject<any>
+
+/**JSON.stringify封装
+* @param {IObject<any>} target  对象
+* @return {string} 字符串
+**/
+export type IJsonToString = (target: IObject<any>) => string
 
 // function
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
@@ -252,7 +272,7 @@ export type IRequest = {
     request: Function
     GET: (url: string, params: IObject<any>) => Promise<any>
     POST: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    DELETE: (url: string, params: IObject<any>) => Promise<any>
+    DELETE: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
     PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
     OPTION: (url: string, opts: IRequestOptions) => Promise<any>
 } & IRequestBase

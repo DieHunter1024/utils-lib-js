@@ -21,7 +21,17 @@
       //     return error;
       //   });
       resource
-        .GET("/mock/b1778e8672225082c3155898799ed9d3/api/list",{})
+        .POST(
+          "/mock/b1778e8672225082c3155898799ed9d3/api/list",
+          {
+            name: "hello",
+            age: 22,
+          },
+          {
+            name: "world",
+            age: 23,
+          }
+        )
         .then((res) => console.log(res));
     </script>
   </body>

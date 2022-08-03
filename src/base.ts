@@ -1,5 +1,5 @@
 
-import { IRandomNum, IUrlSplit, IUrlJoin, IGetType, types } from "./index.js"
+import { IRandomNum, IUrlSplit, IUrlJoin, IGetType, IGetTypeByList, types } from "./index.js"
 
 export const randomNum: IRandomNum = (min, max, bool = false) => {
     return Math.floor(Math.random() * (max - min + (bool ? 1 : 0)) + min);
@@ -17,8 +17,10 @@ export const urlSplit: IUrlSplit = (url) => {
     return result;
 }
 
-export const urlJoin: IUrlJoin = (url, query) => {
-    const params = Object.keys(query).map(i => `${i}=${query[i]}`)
+export const urlJoin: IUrlJoin = (url, query = {}) => {
+    const queryObject = Object.keys(query)
+    if (queryObject.length === 0) return url
+    const params = queryObject.map(i => `${i}=${query[i]}`)
     return `${url}${url.includes("?") ? "&" : '?'}${params.join("&")}`;
 }
 
@@ -31,4 +33,9 @@ export const getType: IGetType<types> = (data) => {
         return types[key];
     }
     return type;
+}
+
+export const getTypeByList: IGetTypeByList = (data, whiteList = []) => {
+    const __type = getType(data)
+    return whiteList.indexOf(__type) > 0
 }
