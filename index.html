@@ -9,9 +9,20 @@
   <body>
     <script type="module">
       import { Request } from "./dist/esm/request.js";
-      new Request("https://www.fastmock.site").GET(
-        "/mock/b1778e8672225082c3155898799ed9d3/api/list"
-      );
+      const resource = new Request("https://www.fastmock.site");
+      // resource
+      //   .use("request", (params) => {
+      //     return params;
+      //   })
+      //   .use("response", (params) => {
+      //     return params;
+      //   })
+      //   .use("error", (error) => {
+      //     return error;
+      //   });
+      resource
+        .GET("/mock/b1778e8672225082c3155898799ed9d3/api/list")
+        .then((res) => console.log(res));
     </script>
   </body>
 </html>

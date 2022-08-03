@@ -1,13 +1,42 @@
-import { urlJoin, defer, IRequest, IRequestBase } from "./index.js"
+import { urlJoin, defer, IRequest, IRequestBase, IInterceptors } from "./index.js"
 
-
-export abstract class RequestBase implements IRequestBase {
+export class Interceptors implements IInterceptors {
+    private requestSuccess: Function
+    private responseSuccess: Function
+    private error: Function
+    use(type, fn) {
+        switch (type) {
+            case "request":
+                this.requestSuccess = fn
+                break;
+            case "response":
+                this.responseSuccess = fn
+                break;
+            case "error":
+                this.error = fn
+                break;
+        }
+        return this
+    }
+    get reqFn() {
+        return this.requestSuccess
+    }
+    get resFn() {
+        return this.responseSuccess
+    }
+    get errFn() {
+        return this.error
+    }
+}
+export abstract class RequestBase extends Interceptors implements IRequestBase {
     origin: string
     constructor(origin) {
+        super()
         this.origin = origin ?? ''
     }
     abstract fetch(url, opts): Promise<void>
     abstract http(url, opts): Promise<void>
+
     chackUrl = (url) => {
         return url.startsWith('/')
     }
@@ -29,9 +58,11 @@ export abstract class RequestBase implements IRequestBase {
                 return this.http
         }
     }
-    initOptions = (opts) => {
-        const { method = "GET", params = {}, body = {}, async = true, timeout = 30 * 1000 } = opts
-        return { method, params, body, async, timeout }
+    initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), ...others }) => {
+        const params: RequestInit = {
+            method, headers, body: method === "GET" ? null : body, signal: abort.signal, ...others
+        }
+        return this.reqFn?.(params) ?? params
     }
 
 }
@@ -45,13 +76,12 @@ export class Request extends RequestBase implements IRequest {
     fetch = (url, opts) => {
         const { promise, resolve, reject } = defer()
         url = this.fixOrigin(url)
-        const { method, params, body, async, timeout } = this.initOptions(opts)
-        fetch(url, this.initOptions(opts)).then((res) => {
-            console.log(res)
-            return res.json()
-        }).then((res) => {
-            console.log(res)
-        })
+        fetch(url, this.initFetchParams(url, opts)).then((response) => {
+            if (response.status >= 200 && response.status < 300) {
+                return response.json()
+            }
+            return reject(response.statusText)
+        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(err => reject(this.errFn?.(err) ?? err))
         return promise
     }
     http = (url, opts) => {

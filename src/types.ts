@@ -214,6 +214,9 @@ export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler:
 export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 
 // request
+export type IInterceptors = {
+    use(type: "request" | "response" | "error", fn: Function): void
+}
 export type IRequestBase = {
     origin: string
     fixOrigin: (fixStr: string) => string
@@ -221,6 +224,7 @@ export type IRequestBase = {
     chackUrl: (url: string) => boolean
     fetch: (url: string, opts: IRequestOptions) => Promise<any>
     http: (url: string, opts: IRequestOptions) => Promise<any>
+    initFetchParams: (url: string, opts: IRequestOptions) => any
 }
 
 export type IRequest = {
@@ -231,16 +235,16 @@ export type IRequest = {
     PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
     OPTION: (url: string, opts: IRequestOptions) => Promise<any>
 } & IRequestBase
-export type IRequestParams<T> = T | IObject<any> | any
+export type IRequestParams<T> = T | IObject<any> | null
 export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
-export type IRequestBody = IRequestParams<RequestInit['body']>
-export type IRequestHeaders = IRequestParams<RequestInit['headers']>
+export type IRequestBody = IRequestParams<BodyInit>
+export type IRequestHeaders = IRequestParams<HeadersInit>
 export type IRequestOptions = {
     method?: IRequestMethods
-    params?: IRequestParams<IObject<any>>
+    query?: IRequestParams<IObject<any>>
     body?: IRequestBody
     headers?: IRequestHeaders
-    signal?: AbortSignal
-    async?: boolean
+    abort?: AbortController
     timeout?: number
+    [key: string]: any
 }
