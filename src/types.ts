@@ -240,6 +240,7 @@ export type IDataType = "text" | "json" | "blob" | "formData" | "arrayBuffer"
 export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
 export type IRequestBody = IRequestParams<BodyInit>
 export type IRequestHeaders = IRequestParams<HeadersInit>
+export type IrequestFn = (url: string, params: IObject<any>, body: IRequestBody, opts: IRequestOptions) => Promise<any>
 export type IRequestOptions = {
     method?: IRequestMethods
     query?: IRequestParams<IObject<any>>
@@ -270,9 +271,9 @@ export type IRequestBase = {
 
 export type IRequest = {
     request: Function
-    GET: (url: string, params: IObject<any>) => Promise<any>
-    POST: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    DELETE: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    PUT: (url: string, params: IObject<any>, body: IRequestBody) => Promise<any>
-    OPTION: (url: string, opts: IRequestOptions) => Promise<any>
+    GET: IrequestFn
+    POST: IrequestFn
+    DELETE: IrequestFn
+    PUT: IrequestFn
+    OPTION: IrequestFn
 } & IRequestBase

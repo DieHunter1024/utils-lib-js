@@ -102,21 +102,20 @@ export class Request extends RequestBase implements IRequest {
         return promise
     }
 
-    GET = (url, query = {}) => {
-        return this.request(url, { query, method: "GET" })
+    GET = (url, query = {}, _, opts) => {
+        return this.request(url, { query, method: "GET", ...opts })
     }
 
-    POST = (url, query = {}, body) => {
-        return this.request(url, { query, method: "POST", body })
+    POST = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "POST", body, ...opts })
     }
-    PUT = (url, query = {}, body) => {
-        return this.request(url, { query, method: "PUT", body })
+    PUT = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "PUT", body, ...opts })
     }
-    DELETE = (url, query = {}, body) => {
-        return this.request(url, { query, method: "DELETE", body })
+    DELETE = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "DELETE", body, ...opts })
     }
-    OPTION = () => {
-        const { promise, resolve, reject } = defer()
-        return promise
+    OPTION = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "DELETE", body, ...opts })
     }
 }
