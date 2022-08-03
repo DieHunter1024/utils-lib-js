@@ -1,4 +1,4 @@
-import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject, IGetInstance, IClassDecorator, getType } from "./index.js"
+import { IGetValue, ISetValue, IMixIn, ICloneDeep, ICreateObjectVariable, IEnumInversion, IInherit, ICreateObject, IGetInstance, IClassDecorator, getType, getTypeByList, IStringToJson, IJsonToString } from "./index.js"
 export const getValue: IGetValue = (object, key, defaultValue = '') => {
     const paths = key.split('.')
     for (const i of paths) { //逐层遍历path
@@ -119,5 +119,23 @@ export const classDecorator: IClassDecorator = (params): ClassDecorator => {
                 target.prototype[key] = params[key]
             }
         }
+    }
+}
+
+export const stringToJson: IStringToJson = (target: string) => {
+    if (getType(target) !== "string") return {}
+    try {
+        return JSON.parse(target)
+    } catch (error) {
+        return {}
+    }
+}
+
+export const jsonToString: IJsonToString = (target: any) => {
+    if (!getTypeByList(target, ["array", "object", "set", "map"])) return ""
+    try {
+        return JSON.stringify(target)
+    } catch (error) {
+        return ""
     }
 }
