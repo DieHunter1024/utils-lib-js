@@ -1,5 +1,5 @@
 import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IInterceptors } from "./index.js"
-
+import { request } from "node:http"
 
 export class Interceptors implements IInterceptors {
     private requestSuccess: Function
@@ -46,7 +46,7 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
         return fixStr
     }
     envDesc = () => {
-        if (Window) {
+        if (typeof Window !== "undefined") {
             return "Window"
         }
         return "Node"
@@ -126,7 +126,7 @@ export class Request extends RequestBase implements IRequest {
     OPTIONS = (url, query = {}, body, opts) => {
         return this.request(url, { query, method: "OPTIONS", body, ...opts })
     }
-    
+
     HEAD = (url, query = {}, body, opts) => {
         return this.request(url, { query, method: "HEAD", body, ...opts })
     }
