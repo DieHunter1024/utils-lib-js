@@ -9,12 +9,14 @@
   <body>
     <script type="module">
       import { Request } from "../dist/esm/request.js";
-      const resource = new Request("https://www.fastmock.site/mock/b1778e8672225082c3155898799ed9d3/api");
+      const resource = new Request("http://127.0.0.1:1024");
       resource
         .use("request", (params) => {
+          console.log(params)
           return params;
         })
         .use("response", (params) => {
+          console.log(params)
           return params;
         })
         .use("error", (error) => {
@@ -23,15 +25,14 @@
         });
       resource
         .GET(
-          "/list",
+          "/getList",
           {
             name: "hello",
             age: 22,
           },
           {},
           {}
-        )
-        .then((res) => console.log(res));
+        ).then(console.log)
     </script>
   </body>
 </html>
