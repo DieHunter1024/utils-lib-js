@@ -266,20 +266,16 @@ export type IInterceptors = {
 }
 // 公共函数
 export type IRequestBase = {
-    origin: string
+    readonly origin: string
     fixOrigin: (fixStr: string) => string
-    envDesc: () => "Window" | "Node"
-    chackUrl: (url: string) => boolean
     fetch: (url: string, opts: IRequestOptions) => Promise<any>
     http: (url: string, opts: IRequestOptions) => Promise<any>
-    initDefaultParams: (url: string, opts: IRequestOptions) => any
     initFetchParams: (url: string, opts: IRequestOptions) => any
     initHttpParams: (url: string, opts: IRequestOptions) => any
     getDataByType: (type: IDataType, response: Response) => Promise<any>
 }
 // 请求主体类
 export type IRequest = {
-    request: Function
     GET: IRequestFn
     POST: IRequestFn
     DELETE: IRequestFn

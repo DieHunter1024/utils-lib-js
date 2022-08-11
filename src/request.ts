@@ -1,7 +1,8 @@
 import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IInterceptors } from "./index.js"
 import { request } from "node:http"
-
-export class Interceptors implements IInterceptors {
+// import https from "node:https"
+// const { request } = http
+class Interceptors implements IInterceptors {
     private requestSuccess: Function
     private responseSuccess: Function
     private error: Function
@@ -29,8 +30,8 @@ export class Interceptors implements IInterceptors {
         return this.error
     }
 }
-export abstract class RequestBase extends Interceptors implements IRequestBase {
-    origin: string
+abstract class RequestBase extends Interceptors implements IRequestBase {
+    readonly origin: string
     constructor(origin) {
         super()
         this.origin = origin ?? ''
@@ -38,7 +39,7 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
     abstract fetch(url, opts): Promise<void>
     abstract http(url, opts): Promise<void>
 
-    chackUrl = (url) => {
+    private chackUrl = (url: string) => {
         return url.startsWith('/')
     }
 
@@ -47,16 +48,16 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
         return fixStr
     }
 
-    envDesc = () => {
+    private envDesc = () => {
         if (typeof Window !== "undefined") {
             return "Window"
         }
         return "Node"
     }
 
-    errorFn = reject => err => reject(this.errFn?.(err) ?? err)
+    protected errorFn = reject => err => reject(this.errFn?.(err) ?? err)
 
-    clearTimer = opts => !!opts.timer && (clearTimeout(opts.timer), opts.timer = null)
+    protected clearTimer = opts => !!opts.timer && (clearTimeout(opts.timer), opts.timer = null)
 
     requestType = () => {
         switch (this.envDesc()) {
@@ -67,7 +68,7 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
         }
     }
 
-    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
+    private initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
         url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller.signal, controller, type, timer: null, ...others
     })
 
@@ -80,6 +81,7 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
 
     initHttpParams = (url, opts) => {
         const params = this.initDefaultParams(url, opts)
+
         return this.reqFn?.(params) ?? params
     }
 
@@ -98,7 +100,7 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
 
 }
 export class Request extends RequestBase implements IRequest {
-    request: Function
+    private request: Function
     constructor(origin) {
         super(origin)
         this.request = this.requestType()
@@ -120,6 +122,12 @@ export class Request extends RequestBase implements IRequest {
 
     http = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
+        const params = this.initFetchParams(_url, _opts)
+        // console.log(params)
+        const server = request(params)
+        server.on("finish",(res) => {
+            console.log(res)
+        })
         return promise
     }
 
