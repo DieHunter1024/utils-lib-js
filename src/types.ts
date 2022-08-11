@@ -281,5 +281,7 @@ export type IRequest = {
     POST: IRequestFn
     DELETE: IRequestFn
     PUT: IRequestFn
-    OPTION: IRequestFn
+    OPTIONS: IRequestFn
+    HEAD: IRequestFn
+    PATCH: IRequestFn
 } & IRequestBase
