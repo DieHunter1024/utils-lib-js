@@ -41,16 +41,23 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
     chackUrl = (url) => {
         return url.startsWith('/')
     }
+
     fixOrigin = (fixStr: string) => {
         if (this.chackUrl(fixStr)) return this.origin + fixStr
         return fixStr
     }
+
     envDesc = () => {
         if (typeof Window !== "undefined") {
             return "Window"
         }
         return "Node"
     }
+
+    errorFn = reject => err => reject(this.errFn?.(err) ?? err)
+
+    clearTimer = opts => !!opts.timer && (clearTimeout(opts.timer), opts.timer = null)
+
     requestType = () => {
         switch (this.envDesc()) {
             case "Window":
@@ -59,14 +66,23 @@ export abstract class RequestBase extends Interceptors implements IRequestBase {
                 return this.http
         }
     }
-    initFetchParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, abort = new AbortController(), type = "json", ...others }) => {
-        url = urlJoin(this.fixOrigin(url), query)
-        const timer = setTimeout(() => abort.abort(), timeout)
-        const params = {
-            url, method, headers, body: method === "GET" ? null : jsonToString(body), timeout, timer, signal: abort.signal, type, ...others
-        }
+
+    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
+        url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller.signal, controller, type, timer: null, ...others
+    })
+
+    initFetchParams = (url, opts) => {
+        const params = this.initDefaultParams(url, opts)
+        const { controller, timer, timeout } = params
+        !!!timer && (params.timer = setTimeout(() => controller.abort(), timeout))
         return this.reqFn?.(params) ?? params
     }
+
+    initHttpParams = (url, opts) => {
+        const params = this.initDefaultParams(url, opts)
+        return this.reqFn?.(params) ?? params
+    }
+
     getDataByType = (type, response) => {
         switch (type) {
             case "text":
@@ -91,17 +107,17 @@ export class Request extends RequestBase implements IRequest {
     fetch = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
         const { url, ...opts } = this.initFetchParams(_url, _opts)
-        const { signal, timer } = opts
-        const errorFn = err => reject(this.errFn?.(err) ?? err)
-        signal.addEventListener('abort', errorFn);
+        const { signal } = opts
+        signal.addEventListener('abort', this.errorFn(reject));
         fetch(url, opts).then((response) => {
             if (response.status >= 200 && response.status < 300) {
                 return this.getDataByType(opts.type, response)
             }
-            return errorFn(response.statusText)
-        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(errorFn).finally(() => clearTimeout(timer))
+            return this.errorFn(reject)
+        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(this.errorFn(reject)).finally(() => this.clearTimer(opts))
         return promise
     }
+
     http = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
         return promise

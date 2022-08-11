@@ -57,7 +57,7 @@ export type IGetTypeByList = (data: any, whiteList: string[]) => boolean;
 * @param {any} defaultValue  未取得时默认值
 * @return {IObject[IKey]} 对象某个属性
 **/
-export type IGetValue = <T>(object: IObject<T> | IObject<T>[IKey], key: string, defaultValue?: any) => IObject<T>[IKey]
+export type IGetValue = <T, U = IObject<T> | IObject<T>[IKey]>(object: U, key: string, defaultValue?: any) => U
 
 /**lodash中的 _.set()，赋值对象某级属性
 * @param {IObject} object  目标对象
@@ -252,8 +252,9 @@ export type IRequestOptions = {
     query?: IRequestParams<IObject<any>>
     body?: IRequestBody
     headers?: IRequestHeaders
-    abort?: AbortController
+    controller?: AbortController
     timeout?: number
+    timer?: number | unknown | null
     [key: string]: any
 }
 // 拦截器
@@ -271,7 +272,9 @@ export type IRequestBase = {
     chackUrl: (url: string) => boolean
     fetch: (url: string, opts: IRequestOptions) => Promise<any>
     http: (url: string, opts: IRequestOptions) => Promise<any>
+    initDefaultParams: (url: string, opts: IRequestOptions) => any
     initFetchParams: (url: string, opts: IRequestOptions) => any
+    initHttpParams: (url: string, opts: IRequestOptions) => any
     getDataByType: (type: IDataType, response: Response) => Promise<any>
 }
 // 请求主体类
