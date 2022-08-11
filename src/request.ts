@@ -1,5 +1,6 @@
 import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IInterceptors } from "./index.js"
 
+
 export class Interceptors implements IInterceptors {
     private requestSuccess: Function
     private responseSuccess: Function
@@ -101,7 +102,7 @@ export class Request extends RequestBase implements IRequest {
         }).then(res => resolve(this.resFn?.(res) ?? res)).catch(errorFn).finally(() => clearTimeout(timer))
         return promise
     }
-    http = (url, opts) => {
+    http = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
         return promise
     }
@@ -113,13 +114,24 @@ export class Request extends RequestBase implements IRequest {
     POST = (url, query = {}, body, opts) => {
         return this.request(url, { query, method: "POST", body, ...opts })
     }
+
     PUT = (url, query = {}, body, opts) => {
         return this.request(url, { query, method: "PUT", body, ...opts })
     }
+
     DELETE = (url, query = {}, body, opts) => {
         return this.request(url, { query, method: "DELETE", body, ...opts })
     }
-    OPTION = (url, query = {}, body, opts) => {
-        return this.request(url, { query, method: "DELETE", body, ...opts })
+
+    OPTIONS = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "OPTIONS", body, ...opts })
+    }
+    
+    HEAD = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "HEAD", body, ...opts })
+    }
+
+    PATCH = (url, query = {}, body, opts) => {
+        return this.request(url, { query, method: "PATCH", body, ...opts })
     }
 }
