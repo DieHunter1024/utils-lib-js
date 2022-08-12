@@ -1,5 +1,6 @@
 import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IInterceptors } from "./index.js"
 import { request } from "node:http"
+import { parse } from "node:url"
 // import https from "node:https"
 // const { request } = http
 class Interceptors implements IInterceptors {
@@ -67,9 +68,9 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
                 return this.http
         }
     }
-
+    
     private initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
-        url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller.signal, controller, type, timer: null, ...others
+        url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller?.signal, controller, type, timer: null, ...others
     })
 
     initFetchParams = (url, opts) => {
@@ -81,8 +82,10 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
 
     initHttpParams = (url, opts) => {
         const params = this.initDefaultParams(url, opts)
-
-        return this.reqFn?.(params) ?? params
+        const { controller, timer, timeout } = params
+        const options = parse(params.url, true)
+        !!!timer && (params.timer = setTimeout(() => controller.abort(), timeout))
+        return this.reqFn?.({ ...params, ...options }) ?? params
     }
 
     getDataByType = (type, response) => {
@@ -122,12 +125,15 @@ export class Request extends RequestBase implements IRequest {
 
     http = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
-        const params = this.initFetchParams(_url, _opts)
-        // console.log(params)
-        const server = request(params)
-        server.on("finish",(res) => {
-            console.log(res)
+        const params = this.initHttpParams(_url, _opts)
+        const req = request(params, (response) => {
+            response.setEncoding('utf8');
+            response.on('data', res => resolve(this.resFn?.(res) ?? res));
         })
+        // req.destroy()
+        req.on('error', reject);
+        req.end();
+        // console.log(server)
         return promise
     }
 
