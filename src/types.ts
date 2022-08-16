@@ -236,6 +236,10 @@ export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 // request
 
 export type IRequestParams<T> = T | IObject<any> | null
+// 请求路径
+export type IUrl = string
+// 环境判断
+export type IEnv = 'Window' | 'Node'
 // fetch返回取值方式
 export type IDataType = "text" | "json" | "blob" | "formData" | "arrayBuffer"
 // 请求方式
@@ -244,8 +248,10 @@ export type IRequestMethods = "GET" | "POST" | "DELETE" | "PUT" | "OPTION"
 export type IRequestBody = IRequestParams<BodyInit>
 // heads结构
 export type IRequestHeaders = IRequestParams<HeadersInit>
+// 请求基础函数
+export type IRequestBaseFn = (url: IUrl, opts: IRequestOptions) => Promise<any>
 // 请求函数体
-export type IRequestFn = (url: string, params: IObject<any>, body: IRequestBody, opts: IRequestOptions) => Promise<any>
+export type IRequestFn = (url: IUrl, params: IObject<any>, body: IRequestBody, opts: IRequestOptions) => Promise<any>
 // 请求参数
 export type IRequestOptions = {
     method?: IRequestMethods
@@ -267,12 +273,22 @@ export type IInterceptors = {
 // 公共函数
 export type IRequestBase = {
     readonly origin: string
+    chackUrl: (url: IUrl) => boolean
+    envDesc: () => IEnv
+    errorFn: <Err = any, R = Function>(reject: R) => (err: Err) => R
+    clearTimer: (opts: IRequestOptions) => void
+    initAbort: <T = IRequestOptions>(opts: T) => T
+    requestType: () => IRequestBaseFn
     fixOrigin: (fixStr: string) => string
-    fetch: (url: string, opts: IRequestOptions) => Promise<any>
-    http: (url: string, opts: IRequestOptions) => Promise<any>
-    initFetchParams: (url: string, opts: IRequestOptions) => any
-    initHttpParams: (url: string, opts: IRequestOptions) => any
+    fetch: IRequestBaseFn
+    http: IRequestBaseFn
     getDataByType: (type: IDataType, response: Response) => Promise<any>
+}
+// 初始化参数
+export type IRequestInit = {
+    initDefaultParams: (url: IUrl, opts: IRequestOptions) => any
+    initFetchParams: (url: IUrl, opts: IRequestOptions) => any
+    initHttpParams: (url: IUrl, opts: IRequestOptions) => any
 }
 // 请求主体类
 export type IRequest = {
