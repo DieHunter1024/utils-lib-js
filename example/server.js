@@ -6,15 +6,15 @@ const resource = new Request(
 
 resource
   .use("request", (params) => {
-    console.log(params);
+    // console.log(params);
     return params;
   })
   .use("response", (params) => {
-    console.log(params);
+    // console.log(params);
     return params;
   })
   .use("error", (error) => {
-    console.log(error);
+    // console.log(error);
     return error;
   });
   // resource
@@ -28,7 +28,7 @@ resource
     {},
     {}
   ).then((result) => {
-    // console.log(result,'121212')
+    console.log(result,'121212')
   }).catch((err) => {
     console.log(err)
   });

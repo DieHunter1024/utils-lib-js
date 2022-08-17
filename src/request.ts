@@ -95,7 +95,7 @@ abstract class RequestInit extends RequestBase implements IRequestInit {
     }
     abstract fetch(url, opts): Promise<void>
     abstract http(url, opts): Promise<void>
-    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 1 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
+    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
         url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller?.signal, controller, type, timer: null, ...others
     })
 
@@ -135,21 +135,18 @@ export class Request extends RequestInit implements IRequest {
         const { promise, resolve, reject } = defer()
         const params = this.initHttpParams(_url, _opts)
         const { signal } = params
-        signal.addEventListener('abort', () => {
-            console.log('abort')
-        });
         const req = request(params, (response) => {
-            response.setEncoding('utf8');
-            response.on('data', res => resolve(this.resFn?.(res) ?? res));
-            // response.on('end', () => {
-
-            // })
+            if (response.statusCode >= 200 && response.statusCode < 300) {
+                let data = "";
+                response.setEncoding('utf8');
+                response.on('data', (chunk) => data += chunk);
+                return response.on("end", () => resolve(this.resFn?.(data) ?? data));
+            }
+            return this.errorFn(reject)(response?.statusMessage)
         })
-
-        // req.destroy()
-        req.on('error', reject);
+        signal.addEventListener('abort', () => this.errorFn(reject)(req.destroy(new Error('request timeout'))));
+        req.on('error', this.errorFn(reject));
         req.end();
-        // console.log(server)
         return promise
     }
 
