@@ -29,7 +29,7 @@ JavaScript工具函数，封装的一些常用的js函数
 
 export type IKey = string | symbol | number
 
-// 对象类型
+##### 对象类型
 
 export interface IObject<T> {
     [key: IKey]: T | IObject<any>
@@ -47,7 +47,7 @@ export type IInstance<T> = {
 
 export type IDemoteArray<T> = Array<IDemoteArray<T> | T>
 
-// base
+##### base
 
 /**产生区间随机数
 * @param {number} min  最小区间
@@ -89,7 +89,7 @@ export type IGetType<T> = (data: any) => typeof data | T[keyof T] | "null";
 export type IGetTypeByList = (data: any, whiteList: string[]) => boolean;
 
 
-// object
+##### object
 
 /**lodash中的 _.get()，获取对象某级属性
 * @param {IObject} object  目标对象
@@ -184,7 +184,7 @@ export type IStringToJson = (target: string) => IObject<any>
 
 export type IJsonToString = (target: IObject<any>) => string
 
-// function
+##### function
 
 /**节流(throttle):高频事件触发，但在 n 秒内只会执行一次
 * @param {Function} fn  节流处理的函数
@@ -216,7 +216,7 @@ export type IDefer = () => IPromise
 
 export type ICatchAwait<T extends Promise<any>> = (defer: T) => T
 
-// array
+##### array
 
 /**数组乱序
  * @param {Array<any>} arr  目标数组
@@ -239,7 +239,7 @@ export type IArrayUniq<T extends any[]> = (arr: T) => T
 
 export type IArrayDemote<T extends IDemoteArray<any>> = (arr: T, result?: T) => T
 
-// element
+##### element
 
 /**IElementParams
  * @param {string} ele 标签类型
@@ -262,7 +262,7 @@ interface IElementParams<T> {
 
 export type ICreateElement<T = HTMLElement> = (params: IElementParams<T>) => T
 
-// event
+##### event
 
 /**浏览器事件
  * @param {Document} ele 标签
@@ -303,7 +303,7 @@ export type IRemoveHandler = <T extends Document>(ele: T, type: string, handler:
 
 export type IDispatchEvent = <T extends Document>(ele: T, data: any) => void
 
-// request
+##### request
 
 export type IRequestParams<T> = T | IObject<any> | null
 
