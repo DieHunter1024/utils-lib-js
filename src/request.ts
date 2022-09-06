@@ -121,7 +121,7 @@ export class Request extends RequestInit implements IRequest {
         const { signal } = opts
         signal.addEventListener('abort', () => this.errorFn(reject));
         fetch(url, opts).then((response) => {
-            if (response.status >= 200 && response.status < 300) {
+            if (response?.status >= 200 && response?.status < 300) {
                 return this.getDataByType(opts.type, response)
             }
             return this.errorFn(reject)
@@ -134,7 +134,7 @@ export class Request extends RequestInit implements IRequest {
         const params = this.initHttpParams(_url, _opts)
         const { signal } = params
         const req = request(params, (response) => {
-            if (response.statusCode >= 200 && response.statusCode < 300) {
+            if (response?.statusCode >= 200 && response?.statusCode < 300) {
                 let data = "";
                 response.setEncoding('utf8');
                 response.on('data', (chunk) => data += chunk);
