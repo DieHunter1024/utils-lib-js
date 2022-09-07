@@ -105,7 +105,7 @@ abstract class RequestInit extends RequestBase implements IRequestInit {
     initHttpParams = (url, opts) => {
         const params = this.initAbort(this.initDefaultParams(url, opts))
         const options = parse(params.url, true)
-        return this.reqFn?.({ ...params, ...options }) ?? params
+        return this.reqFn?.({ ...params, ...options }) ?? { ...params, ...options }
     }
 }
 export class Request extends RequestInit implements IRequest {
