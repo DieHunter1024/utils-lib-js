@@ -119,13 +119,14 @@ export class Request extends RequestInit implements IRequest {
         const { promise, resolve, reject } = defer()
         const { url, ...opts } = this.initFetchParams(_url, _opts)
         const { signal } = opts
+        promise.finally(() => this.clearTimer(opts))
         signal.addEventListener('abort', () => this.errorFn(reject));
         fetch(url, opts).then((response) => {
             if (response?.status >= 200 && response?.status < 300) {
                 return this.getDataByType(opts.type, response)
             }
             return this.errorFn(reject)
-        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(this.errorFn(reject)).finally(() => this.clearTimer(opts))
+        }).then(res => resolve(this.resFn?.(res) ?? res)).catch(this.errorFn(reject))
         return promise
     }
 
@@ -133,6 +134,7 @@ export class Request extends RequestInit implements IRequest {
         const { promise, resolve, reject } = defer()
         const params = this.initHttpParams(_url, _opts)
         const { signal } = params
+        promise.finally(() => this.clearTimer(params))
         const req = request(params, (response) => {
             if (response?.statusCode >= 200 && response?.statusCode < 300) {
                 let data = "";
