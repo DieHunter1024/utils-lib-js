@@ -1,4 +1,4 @@
-import { urlJoin, defer, jsonToString, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
+import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
 import { request } from "http"
 import { parse } from "url"
 class Interceptors implements IInterceptors {
@@ -85,6 +85,15 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
                 return response['json']()
         }
     }
+    formatBodyString = (res: string) => {
+        return {
+            text: () => res,
+            json: () => stringToJson(res) ?? res,
+            blob: () => stringToJson(res),
+            formData: () => stringToJson(res),
+            arrayBuffer: () => stringToJson(res),
+        }
+    }
 
 }
 abstract class RequestInit extends RequestBase implements IRequestInit {
@@ -140,7 +149,10 @@ export class Request extends RequestInit implements IRequest {
                 let data = "";
                 response.setEncoding('utf8');
                 response.on('data', (chunk) => data += chunk);
-                return response.on("end", () => resolve(this.resFn?.(data) ?? data));
+                return response.on("end", () => {
+                    const result = this.getDataByType(params.type, this.formatBodyString(data))
+                    resolve(this.resFn?.(result) ?? result)
+                });
             }
             return this.errorFn(reject)(response?.statusMessage)
         })
