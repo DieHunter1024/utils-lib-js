@@ -85,13 +85,13 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
                 return response['json']()
         }
     }
-    formatBodyString = (res: string) => {
+    formatBodyString = (bodyString) => {
         return {
-            text: () => res,
-            json: () => stringToJson(res) ?? res,
-            blob: () => stringToJson(res),
-            formData: () => stringToJson(res),
-            arrayBuffer: () => stringToJson(res),
+            text: () => bodyString,
+            json: () => stringToJson(bodyString) ?? bodyString,
+            blob: () => stringToJson(bodyString),
+            formData: () => stringToJson(bodyString),
+            arrayBuffer: () => stringToJson(bodyString),
         }
     }
 
