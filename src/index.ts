@@ -8,3 +8,5 @@ export * from "./types.js"
 export * from "./request.js"
 export * from "./event.js"
 export * from "./storage.js"
+// @ts-ignore
+typeof require === "undefined" && typeof Window !== "undefined" && (window.require = () => { })
