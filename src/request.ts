@@ -1,6 +1,9 @@
 import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
-import { request } from "http"
-import { parse } from "url"
+let request, parse
+if (typeof require !== "undefined") {
+    request = require("http").request
+    parse = require("url").parse
+}
 class Interceptors implements IInterceptors {
     private requestSuccess: Function
     private responseSuccess: Function
