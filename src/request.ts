@@ -1,9 +1,16 @@
 import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
-let httpRequest, httpsRequest, parse
+let httpRequest, httpsRequest, parse, CustomAbortController
 if (typeof require !== "undefined") {
+    CustomAbortController = require("abort-controller")
     httpRequest = require("http").request
     httpsRequest = require("https").request
     parse = require("url").parse
+} else if (typeof AbortController !== "undefined") {
+    CustomAbortController = AbortController
+} else {
+    CustomAbortController = () => {
+        throw new Error('AbortController is not defined')
+    }
 }
 class Interceptors implements IInterceptors {
     private requestSuccess: Function
@@ -108,7 +115,7 @@ abstract class RequestInit extends RequestBase implements IRequestInit {
     }
     abstract fetch(url, opts): Promise<void>
     abstract http(url, opts): Promise<void>
-    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new AbortController(), type = "json", ...others }) => ({
+    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new CustomAbortController(), type = "json", ...others }) => ({
         url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller?.signal, controller, type, timer: null, ...others
     })
 

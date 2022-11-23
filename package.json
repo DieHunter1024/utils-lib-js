@@ -1,6 +1,6 @@
 {
   "name": "utils-lib-js",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "JavaScript工具函数，封装的一些常用的js函数",
   "main": "./dist/common/index.js",
   "types": "./dist/common/index.d.ts",
@@ -12,7 +12,7 @@
   "scripts": {
     "debug:esm": "start cmd /k pnpm run build:hot:esm",
     "debug:node": "start cmd /k pnpm run build:hot:node & pnpm run node:hot",
-    "node:hot": "nodemon ./example/server.js",
+    "node:hot": "nodemon server.js",
     "build:hot:esm": "tsc -p tsconfig.es.json -w",
     "build:hot:node": "tsc -p tsconfig.json -w",
     "build": "pnpm run tsc:build && pnpm run babel:mjs &&  pnpm run babel:cjs",
@@ -36,5 +36,8 @@
   "devDependencies": {
     "@types/node": "^18.7.15",
     "babel-cli": "^6.26.0"
+  },
+  "dependencies": {
+    "abort-controller": "^3.0.0"
   }
 }
