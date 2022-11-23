@@ -1,7 +1,8 @@
 import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
-let request, parse
+let httpRequest, httpsRequest, parse
 if (typeof require !== "undefined") {
-    request = require("http").request
+    httpRequest = require("http").request
+    httpsRequest = require("https").request
     parse = require("url").parse
 }
 class Interceptors implements IInterceptors {
@@ -44,7 +45,9 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
     chackUrl = (url: string) => {
         return url.startsWith('/')
     }
-
+    checkIsHttps = (url: string) => {
+        return url.startsWith('https')
+    }
     fixOrigin = (fixStr: string) => {
         if (this.chackUrl(fixStr)) return this.origin + fixStr
         return fixStr
@@ -145,8 +148,9 @@ export class Request extends RequestInit implements IRequest {
     http = (_url, _opts) => {
         const { promise, resolve, reject } = defer()
         const params = this.initHttpParams(_url, _opts)
-        const { signal } = params
+        const { signal, url } = params
         promise.finally(() => this.clearTimer(params))
+        const request = this.checkIsHttps(url) ? httpsRequest : httpRequest
         const req = request(params, (response) => {
             if (response?.statusCode >= 200 && response?.statusCode < 300) {
                 let data = "";
