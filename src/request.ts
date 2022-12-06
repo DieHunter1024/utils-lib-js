@@ -120,14 +120,16 @@ abstract class RequestInit extends RequestBase implements IRequestInit {
     } as IRequestOptions)
 
     initFetchParams = (url: IUrl, opts: IRequestOptions) => {
-        const params = this.initAbort(this.initDefaultParams(url, opts))
-        return this.reqFn?.(params) ?? params
+        const _temp = this.initAbort(this.initDefaultParams(url, opts))
+        const params = this.reqFn?.(_temp) ?? _temp
+        return params
     }
 
     initHttpParams = (url: IUrl, opts: IRequestOptions) => {
-        const params = this.initAbort(this.initDefaultParams(url, opts))
+        const _temp = this.initAbort(this.initDefaultParams(url, opts))
+        const params = this.reqFn?.(_temp) ?? _temp
         const options = parse(params.url, true)
-        return this.reqFn?.({ ...params, ...options }) ?? { ...params, ...options }
+        return { ...params, ...options }
     }
 }
 export class Request extends RequestInit implements IRequest {
