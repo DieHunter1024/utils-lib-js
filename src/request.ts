@@ -1,4 +1,4 @@
-import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions } from "./index.js"
+import { urlJoin, defer, jsonToString, stringToJson, IRequest, IRequestBase, IRequestInit, IInterceptors, IUrl, IObject, IRequestBody, IRequestOptions, IRequestBaseFn, IEnv } from "./index.js"
 let httpRequest, httpsRequest, parse, CustomAbortController
 if (typeof require !== "undefined") {
     CustomAbortController = require("abort-controller")
@@ -16,7 +16,7 @@ class Interceptors implements IInterceptors {
     private requestSuccess: Function
     private responseSuccess: Function
     private error: Function
-    use(type, fn) {
+    use(type: "request" | "response" | "error", fn: Function): IInterceptors {
         switch (type) {
             case "request":
                 this.requestSuccess = fn
@@ -41,18 +41,18 @@ class Interceptors implements IInterceptors {
     }
 }
 abstract class RequestBase extends Interceptors implements IRequestBase {
-    readonly origin: string
-    constructor(origin) {
+    readonly origin: IUrl
+    constructor(origin: IUrl) {
         super()
         this.origin = origin ?? ''
     }
-    abstract fetch(url, opts): Promise<void>
-    abstract http(url, opts): Promise<void>
+    abstract fetch(url: string, opts: IRequestOptions): Promise<void>
+    abstract http(url: string, opts: IRequestOptions): Promise<void>
 
-    chackUrl = (url: string) => {
+    chackUrl = (url: IUrl) => {
         return url.startsWith('/')
     }
-    checkIsHttps = (url: string) => {
+    checkIsHttps = (url: IUrl) => {
         return url.startsWith('https')
     }
     fixOrigin = (fixStr: string) => {
@@ -60,7 +60,7 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
         return fixStr
     }
 
-    envDesc = () => {
+    envDesc = (): IEnv => {
         if (typeof Window !== "undefined") {
             return "Window"
         }
@@ -69,15 +69,15 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
 
     errorFn = reject => err => reject(this.errFn?.(err) ?? err)
 
-    clearTimer = opts => !!opts.timer && (clearTimeout(opts.timer), opts.timer = null)
+    clearTimer = (opts) => !!opts.timer && (clearTimeout(opts.timer), opts.timer = null)
 
-    initAbort = (params) => {
+    initAbort = (params: IRequestOptions): IRequestOptions => {
         const { controller, timer, timeout } = params
         !!!timer && (params.timer = setTimeout(() => controller.abort(), timeout))
         return params
     }
 
-    requestType = () => {
+    requestType = (): IRequestBaseFn => {
         switch (this.envDesc()) {
             case "Window":
                 return this.fetch
@@ -98,7 +98,7 @@ abstract class RequestBase extends Interceptors implements IRequestBase {
                 return response['json']()
         }
     }
-    formatBodyString = (bodyString) => {
+    formatBodyString = (bodyString: string): IObject<Function> => {
         return {
             text: () => bodyString,
             json: () => stringToJson(bodyString) ?? bodyString,
@@ -115,16 +115,16 @@ abstract class RequestInit extends RequestBase implements IRequestInit {
     }
     abstract fetch(url, opts): Promise<void>
     abstract http(url, opts): Promise<void>
-    initDefaultParams = (url, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new CustomAbortController(), type = "json", ...others }) => ({
+    initDefaultParams = (url: IUrl, { method = "GET", query = {}, headers = {}, body = null, timeout = 30 * 1000, controller = new CustomAbortController(), type = "json", ...others }) => ({
         url: urlJoin(this.fixOrigin(url), query), method, headers, body: method === "GET" ? null : jsonToString(body), timeout, signal: controller?.signal, controller, type, timer: null, ...others
-    })
+    } as IRequestOptions)
 
-    initFetchParams = (url, opts) => {
+    initFetchParams = (url: IUrl, opts: IRequestOptions) => {
         const params = this.initAbort(this.initDefaultParams(url, opts))
         return this.reqFn?.(params) ?? params
     }
 
-    initHttpParams = (url, opts) => {
+    initHttpParams = (url: IUrl, opts: IRequestOptions) => {
         const params = this.initAbort(this.initDefaultParams(url, opts))
         const options = parse(params.url, true)
         return this.reqFn?.({ ...params, ...options }) ?? { ...params, ...options }
@@ -137,7 +137,7 @@ export class Request extends RequestInit implements IRequest {
         this.request = this.requestType()
     }
 
-    fetch = (_url, _opts) => {
+    fetch = (_url: string, _opts: IRequestOptions): Promise<any> => {
         const { promise, resolve, reject } = defer()
         const { url, ...opts } = this.initFetchParams(_url, _opts)
         const { signal } = opts
@@ -152,7 +152,7 @@ export class Request extends RequestInit implements IRequest {
         return promise
     }
 
-    http = (_url, _opts) => {
+    http = (_url: string, _opts: IRequestOptions): Promise<any> => {
         const { promise, resolve, reject } = defer()
         const params = this.initHttpParams(_url, _opts)
         const { signal, url } = params
@@ -176,31 +176,17 @@ export class Request extends RequestInit implements IRequest {
         return promise
     }
 
-    GET = (url?: IUrl, query?: IObject<any>, _?: IRequestBody | void, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "GET", ...opts })
-    }
+    GET = (url?: IUrl, query?: IObject<any>, _?: IRequestBody | void, opts?: IRequestOptions) => this.request(url, { query, method: "GET", ...opts })
 
-    POST = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "POST", body, ...opts })
-    }
+    POST = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "POST", body, ...opts })
 
-    PUT = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "PUT", body, ...opts })
-    }
+    PUT = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "PUT", body, ...opts })
 
-    DELETE = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "DELETE", body, ...opts })
-    }
+    DELETE = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "DELETE", body, ...opts })
 
-    OPTIONS = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "OPTIONS", body, ...opts })
-    }
+    OPTIONS = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "OPTIONS", body, ...opts })
 
-    HEAD = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "HEAD", body, ...opts })
-    }
+    HEAD = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "HEAD", body, ...opts })
 
-    PATCH = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => {
-        return this.request(url, { query, method: "PATCH", body, ...opts })
-    }
+    PATCH = (url?: IUrl, query?: IObject<any>, body?: IRequestBody, opts?: IRequestOptions) => this.request(url, { query, method: "PATCH", body, ...opts })
 }

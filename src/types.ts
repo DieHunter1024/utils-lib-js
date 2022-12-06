@@ -269,7 +269,7 @@ export type IRequestOptions = {
 // 拦截器
 export type IInterceptors = {
     // 添加请求，响应，错误拦截
-    use(type: "request" | "response" | "error", fn: Function): void
+    use(type: "request" | "response" | "error", fn: Function): IInterceptors
     get reqFn(): Function
     get resFn(): Function
     get errFn(): Function
@@ -287,7 +287,7 @@ export type IRequestBase = {
     // 清除当前请求的超时定时器
     clearTimer: (opts: IRequestOptions) => void
     // 初始化超时取消
-    initAbort: <T = IRequestOptions>(opts: T) => T
+    initAbort: (opts: IRequestOptions) => IRequestOptions
     // 策略模式，根据环境切换请求方式
     requestType: () => IRequestBaseFn
     // 拼接请求url
