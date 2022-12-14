@@ -124,7 +124,7 @@ export type IClassDecorator = (params: IObject<any>) => <TFunction extends Funct
 * @param {string} target  字符串
 * @return {IObject<any>} 对象
 **/
-export type IStringToJson = (target: string) => IObject<any>
+export type IStringToJson = (target: string) => IObject<any> | null
 
 /**JSON.stringify封装
 * @param {IObject<any>} target  对象

@@ -123,11 +123,11 @@ export const classDecorator: IClassDecorator = (params): ClassDecorator => {
 }
 
 export const stringToJson: IStringToJson = (target: string) => {
-    if (getType(target) !== "string") return {}
+    if (getType(target) !== "string") return null
     try {
         return JSON.parse(target)
     } catch (error) {
-        return {}
+        return null
     }
 }
 
